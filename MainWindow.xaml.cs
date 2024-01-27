@@ -21,6 +21,7 @@ namespace LumiosNoctis
     {
         
         private KinectManager kinect;
+        public VTubeStudioManager vtubeStudio;
 
         /// <summary>
         /// Initializes a new instance of the MainWindow class.
@@ -94,9 +95,11 @@ namespace LumiosNoctis
         /// </summary>
         /// <param name="sender">object sending the event</param>
         /// <param name="e">event arguments</param>
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             kinect = new KinectManager(this);
+            vtubeStudio = new VTubeStudioManager();
+            await vtubeStudio.Initialize();
         }
 
        

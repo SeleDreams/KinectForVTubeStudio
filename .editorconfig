@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# CS3005: Un identificateur qui se différencie uniquement par la casse n'est pas conforme CLS
+dotnet_diagnostic.CS3005.severity = none

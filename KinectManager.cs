@@ -1,15 +1,10 @@
 ﻿using Microsoft.Kinect.Face;
 using Microsoft.Kinect;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.ComponentModel;
 
 namespace LumiosNoctis
 {
-    internal class KinectManager : IDisposable
+    public class KinectManager : IDisposable
     {
         public MainWindow mainWindow;
         /// <summary>
@@ -22,10 +17,7 @@ namespace LumiosNoctis
         /// </summary>
         private BodyFrameSource bodySource = null;
 
-        /// <summary>
-        /// Body frame reader to get body frames
-        /// </summary>
-        private BodyFrameReader bodyReader = null;
+        private BodyFrameReader bodyFrameReader = null;
 
         /// <summary>
         /// HighDefinitionFaceFrameSource to get a reader and a builder from.
@@ -72,26 +64,10 @@ namespace LumiosNoctis
 
             }
         }
-
-        /// <summary>
-        /// Gets or sets the current Face Builder instructions to user
-        /// </summary>
-        private string CurrentBuilderStatus
-        {
-            get
-            {
-                return this.currentBuilderStatus;
-            }
-
-            set
-            {
-                this.currentBuilderStatus = value;
-            }
-        }
-
         public KinectManager(MainWindow mainWindow)
         {
             this.mainWindow = mainWindow;
+            
             InitializeHDFace();
         }
 
@@ -179,12 +155,10 @@ namespace LumiosNoctis
         /// </summary>
         private void InitializeHDFace()
         {
-            this.CurrentBuilderStatus = "Ready To Start Capture";
-
             this.sensor = KinectSensor.GetDefault();
             this.bodySource = this.sensor.BodyFrameSource;
-            this.bodyReader = this.bodySource.OpenReader();
-            this.bodyReader.FrameArrived += this.BodyReader_FrameArrived;
+            this.bodyFrameReader = this.bodySource.OpenReader();
+            this.bodyFrameReader.FrameArrived += this.BodyReader_FrameArrived;
 
             this.highDefinitionFaceFrameSource = new HighDefinitionFaceFrameSource(this.sensor);
             this.highDefinitionFaceFrameSource.TrackingIdLost += this.HdFaceSource_TrackingIdLost;
@@ -281,6 +255,7 @@ namespace LumiosNoctis
         {
             using (var frame = e.FrameReference.AcquireFrame())
             {
+                
                 // We might miss the chance to acquire the frame; it will be null if it's missed.
                 // Also ignore this frame if face tracking failed.
                 if (frame == null || !frame.IsFaceTracked)

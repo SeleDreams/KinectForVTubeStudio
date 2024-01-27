@@ -62,15 +62,19 @@
     <AssemblyName>KinectForVTubeStudio</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Kinect">
-      <HintPath>$(KINECTSDK20_DIR)Assemblies\Microsoft.Kinect.dll</HintPath>
+    <Reference Include="Microsoft.Kinect, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>packages\Microsoft.Kinect.2.0.1410.19000\lib\net45\Microsoft.Kinect.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Kinect.Face">
-      <HintPath>$(KINECTSDK20_DIR)Redist\Face\$(Platform)\Microsoft.Kinect.Face.dll</HintPath>
+    <Reference Include="Microsoft.Kinect.Face, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=x86">
+      <HintPath>packages\Microsoft.Kinect.Face.2.0.1410.19000\lib\net45\Microsoft.Kinect.Face.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -78,6 +82,9 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="websocket-sharp, Version=1.0.1.0, Culture=neutral, PublicKeyToken=5660b08a1845a91e, processorArchitecture=MSIL">
+      <HintPath>packages\WebSocketSharp-netstandard.1.0.1\lib\net45\websocket-sharp.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
@@ -88,6 +95,26 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="QuaternionExtensions.cs" />
+    <Compile Include="VTS\ConsoleVTSLoggerImpl.cs" />
+    <Compile Include="VTS\CoreVTSPlugin.cs" />
+    <Compile Include="VTS\ErrorID.cs" />
+    <Compile Include="VTS\HotkeyAction.cs" />
+    <Compile Include="VTS\IJsonUtility.cs" />
+    <Compile Include="VTS\ITokenStorage.cs" />
+    <Compile Include="VTS\IVTSLogger.cs" />
+    <Compile Include="VTS\IVTSPlugin.cs" />
+    <Compile Include="VTS\IVTSWebSocket.cs" />
+    <Compile Include="VTS\IWebSocket.cs" />
+    <Compile Include="VTS\NewtonsoftJsonUtilityImpl.cs" />
+    <Compile Include="VTS\TokenStorageImpl.cs" />
+    <Compile Include="VTS\VTSData.cs" />
+    <Compile Include="VTS\VTSExtensions.cs" />
+    <Compile Include="VTS\VTSWebSocket.cs" />
+    <Compile Include="VTS\WebSocketImpl.cs" />
+    <Compile Include="VTS\WebSocketSharpImpl.cs" />
+    <Compile Include="VTubeStudioImplementation.cs" />
+    <Compile Include="VTubeStudioManager.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -121,7 +148,132 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include=".editorconfig" />
     <None Include="app.config" />
+    <None Include="NuiDatabase\Expression\ExpressionRandomForest.model">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\Expression\EyeLeftRandomForest.model">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\Expression\EyeRightRandomForest.model">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\Expression\FacialHairIRRandomForest.model">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\Expression\FacialHairRandomForest.model">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\Expression\Feature.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\Expression\GlassesIRRandomForest.model">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\Expression\GlassesRandomForest.model">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\Expression\LookingAwayRandomForest.model">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\Expression\MouthMovedRandomForest.model">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\Expression\MouthOpenRandomForest.model">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\FaceAlignment.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\FaceAlignmentColor.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\FaceAlignmentColor27.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\FaceDetector.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\FaceOrientation.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\FaceTrackingColor27.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\AAMModel\3DModel.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\AAMModel\3DModel_globalPCA.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\AAMModel\AAMModelData_F.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\AAMModel\AAMModelData_HLP.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\AAMModel\AAMModelData_HRP.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\AAMModel\PCAMaskBias.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\EvalModel\front.mod.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\EvalModel\front_nose.mod.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\EvalModel\left.mod.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\EvalModel\left_nose.mod.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\EvalModel\right.mod.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\EvalModel\right_nose.mod.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\EyeState\EyeClose.pra">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\EyeState\EyeClose.wgh">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\EyeState\LeftCloseRightOpen44Flip.pra">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\EyeState\LeftCloseRightOpen44Flip.wgh">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\EyeState\LeftOpenRightClose44Flip.pra">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\EyeState\LeftOpenRightClose44Flip.wgh">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\MouthModel\close.mod.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\MouthModel\lopen.mod.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\ViewModel\front.mod.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\ViewModel\left.mod.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\ViewModel\right.mod.bin">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\WholeHeadModel\fullMeanHead60_tri.ply">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -134,6 +286,56 @@
   <ItemGroup>
     <Resource Include="Images\Logo.png" />
     <Resource Include="Images\Status.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="NuiDatabase\Expression\NuiExpressionModelManifest.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\AAMModel\Map2D3D_F.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\AAMModel\Map2D3D_HLP.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\AAMModel\Map2D3D_HRP.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\EvalModel\Front.p.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\EvalModel\left.p.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\EvalModel\right.p.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\MouthModel\close.p.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\MouthModel\lopen.p.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\MouthModel\MeanShapes.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\SkintoneModel\skintone_appearance_classifier.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\SkintoneModel\skintone_shape_classifier.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\ViewModel\front.p.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\ViewModel\left.p.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\ViewModel\right.p.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="NuiDatabase\HDFaceTracker\WholeHeadModel\FullHeadMaskVertexCorrespondence.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

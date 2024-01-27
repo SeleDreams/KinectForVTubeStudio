@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media.Media3D;
 using System.Windows.Media;
 using Microsoft.Kinect.Face;
@@ -10,7 +6,7 @@ using System.Windows;
 
 namespace LumiosNoctis
 {
-    internal class FaceMesh : IDisposable
+    public class FaceMesh : IDisposable
     {
         KinectManager kinect;
         MeshGeometry3D theGeometry;
@@ -86,15 +82,53 @@ namespace LumiosNoctis
                 theGeometry.TextureCoordinates.Add(new Point());
             }
         }
-
-        private void UpdateFacialExpressions()
+        public Point3D GetCenterPoint(Point3D upperLip, Point3D lowerLip)
         {
+            float centerX = (float)(upperLip.X + lowerLip.X) / 2;
+            float centerY = (float)(upperLip.Y + lowerLip.Y) / 2;
+            float centerZ = (float)(upperLip.Z + lowerLip.Z) / 2;
+
+            return new Point3D { X = centerX, Y = centerY, Z = centerZ };
+        }
+
+        private async void UpdateFacialExpressions()
+        {
+            // Get the orientation quaternion from FaceAlignment
+            Microsoft.Kinect.Vector4 headOrientation = currentFaceAlignment.FaceOrientation;
+           
+            // Calculate the up direction using quaternion math
+            Vector3D upDirection = new Vector3D(
+                2 * (headOrientation.X * headOrientation.Y + headOrientation.W * headOrientation.Z),
+                headOrientation.W * headOrientation.W - headOrientation.X * headOrientation.X
+                    - headOrientation.Y * headOrientation.Y + headOrientation.Z * headOrientation.Z,
+                2 * (headOrientation.Y * headOrientation.Z - headOrientation.W * headOrientation.X)
+            );
+            upDirection.Normalize();
+
+            var vtubeStudio = kinect.mainWindow.vtubeStudio;
             float jawOpenValue = currentFaceAlignment.AnimationUnits[FaceShapeAnimations.JawOpen];
-            var pivotPoint = currentFaceAlignment.HeadPivotPoint;
+            Console.WriteLine(currentFaceAlignment.AnimationUnits[FaceShapeAnimations.LefteyeClosed] * 10);
+            float rightEyeOpenValue = 1.0f - Math.Min(currentFaceAlignment.AnimationUnits[FaceShapeAnimations.RighteyeClosed] * 5, 1.0f);
+
+            float leftEyeOpenValue = 1.0f - Math.Min(currentFaceAlignment.AnimationUnits[FaceShapeAnimations.LefteyeClosed] * 5,1.0f);
+            vtubeStudio.SetVtubeStudioParam(VTubeStudioParameters.EyeOpenLeft, leftEyeOpenValue);
+            vtubeStudio.SetVtubeStudioParam(VTubeStudioParameters.EyeOpenRight, rightEyeOpenValue);
+            float yaw, pitch, roll;
+            QuaternionMethods.ToYawPitchRoll(currentFaceAlignment.FaceOrientation, out yaw, out pitch, out roll);
+            vtubeStudio.SetVtubeStudioParam(VTubeStudioParameters.FaceAngleX, -pitch );
+            vtubeStudio.SetVtubeStudioParam(VTubeStudioParameters.FaceAngleY, yaw);
+            vtubeStudio.SetVtubeStudioParam(VTubeStudioParameters.FaceAngleZ, -roll);
+            vtubeStudio.SetVtubeStudioParam(VTubeStudioParameters.MouthOpen, jawOpenValue);
+           // CameraSpacePoint leftEyePosition = theGeometry..GetCameraSpacePoint(FaceShapeAnimations.LeftEyeClosed);
             Point3D upperLipPos = theGeometry.Positions[(int)HighDetailFacePoints.MouthUpperlipMidbottom];
             Point3D lowerLipPos = theGeometry.Positions[(int)HighDetailFacePoints.MouthLowerlipMidtop];
+            Point3D middleMouthPosPoint3D = GetCenterPoint(upperLipPos, lowerLipPos);
+            Point3D rightMouthCorner = theGeometry.Positions[(int)HighDetailFacePoints.MouthRightcorner];
+            Vector3D distanceCorner = new Vector3D((rightMouthCorner.X - middleMouthPosPoint3D.X) * upDirection.X, (rightMouthCorner.Y - middleMouthPosPoint3D.Y) * upDirection.Y, (rightMouthCorner.Z - middleMouthPosPoint3D.Z) * upDirection.Z);
+            float SmileValue = (float)(distanceCorner.Length * 100);
+            vtubeStudio.SetVtubeStudioParam(VTubeStudioParameters.MouthSmile, SmileValue);
             //float rightSmirkOpenValue = currentFaceAlignment.AnimationUnits[FaceShapeAnimations.JawSlideRight]
-            Console.WriteLine(jawOpenValue);
+            await vtubeStudio.SendTrackingParameter();
         }
 
         /// <summary>
@@ -102,6 +136,10 @@ namespace LumiosNoctis
         /// </summary>
         private void UpdateMesh()
         {
+            if (currentFaceModel == null)
+            {
+                return;
+            }
             var vertices = currentFaceModel.CalculateVerticesForAlignment(currentFaceAlignment);
 
             for (int i = 0; i < vertices.Count; i++)
@@ -152,7 +190,6 @@ namespace LumiosNoctis
         public void FrameArrived(in HighDefinitionFaceFrame frame)
         {
             frame.GetAndRefreshFaceAlignmentResult(currentFaceAlignment);
-
             this.UpdateMesh();
             this.UpdateFacialExpressions();
         }
